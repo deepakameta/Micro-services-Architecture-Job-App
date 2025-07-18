@@ -1,5 +1,6 @@
 package com.deepakameta.companyms.controller;
 
+import com.deepakameta.companyms.client.ReviewClient;
 import com.deepakameta.companyms.model.Company;
 import com.deepakameta.companyms.service.CompanyService;
 import com.deepakameta.companyms.utils.CompanyException;
@@ -20,6 +21,15 @@ public class CompanyController {
     @GetMapping
     public ResponseEntity<List<Company>> getAllCompanies() {
         return ResponseEntity.ok(companyService.getAllCompanies());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Company> geCompanyById(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(companyService.getCompany(id));
+        } catch (CompanyException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

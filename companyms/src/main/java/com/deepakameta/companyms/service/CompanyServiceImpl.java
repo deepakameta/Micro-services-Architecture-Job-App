@@ -4,9 +4,11 @@ import com.deepakameta.companyms.client.ReviewClient;
 import com.deepakameta.companyms.model.Company;
 import com.deepakameta.companyms.repository.CompanyRepository;
 import com.deepakameta.companyms.utils.CompanyException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public Company getCompanyById(long id) throws CompanyException {
         Optional<Company> company = companyRepository.findById(id);
         if (company.isPresent()) {
@@ -55,6 +58,12 @@ public class CompanyServiceImpl implements CompanyService {
         }
     }
 
+    public Company companyBreakerFallback(long id, Throwable t) {
+        Company fallbackCompany = new Company();
+        fallbackCompany.setCompanyId(id);
+        fallbackCompany.setName("Fallback Company");
+        return fallbackCompany;
+    }
 
     @Override
     public String addCompany(Company company) {

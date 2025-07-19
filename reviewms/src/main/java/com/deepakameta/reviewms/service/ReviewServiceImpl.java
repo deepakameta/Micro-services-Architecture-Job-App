@@ -4,9 +4,13 @@ import com.deepakameta.reviewms.client.CompanyClient;
 import com.deepakameta.reviewms.model.Review;
 import com.deepakameta.reviewms.repository.ReviewRepository;
 import com.deepakameta.reviewms.utils.ReviewException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -18,6 +22,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
+    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+//    @Retry(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
+//    @RateLimiter(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public List<Review> getReview(long companyId) throws ReviewException {
         boolean doesCompanyExist = companyClient.getCompany(companyId) != null;
         if (doesCompanyExist) {
@@ -28,6 +35,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public String addReview(long companyId, Review review) throws ReviewException {
         boolean doesCompanyExist = companyClient.getCompany(companyId) != null;
         if (doesCompanyExist) {
@@ -38,6 +46,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public String updateReviewById(long companyId, long reviewId, Review review) throws ReviewException {
         boolean doesCompanyExist = companyClient.getCompany(companyId) != null;
         if (doesCompanyExist) {
@@ -55,6 +64,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @CircuitBreaker(name = "companyBreaker", fallbackMethod = "companyBreakerFallback")
     public String deleteReviewById(long companyId, long reviewId) throws ReviewException {
         boolean doesCompanyExist = companyClient.getCompany(companyId) != null;
         if (doesCompanyExist) {
@@ -68,5 +78,14 @@ public class ReviewServiceImpl implements ReviewService {
         } else {
             throw new ReviewException("Company Not Found");
         }
+    }
+
+    public List<Review> companyBreakerFallback(Exception e) {
+        List<Review> list = new ArrayList<Review>();
+        Review r =  new Review();
+        r.setCompanyId(1);
+        r.setContent("This is fallback from circuitBreaker");
+        list.add(r);
+        return list;
     }
 }

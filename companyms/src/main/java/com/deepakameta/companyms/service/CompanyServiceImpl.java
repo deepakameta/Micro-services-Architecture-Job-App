@@ -40,6 +40,23 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public Company getCompanyById(long id) throws CompanyException {
+        Optional<Company> company = companyRepository.findById(id);
+        if (company.isPresent()) {
+            Company company1 = company.get();
+            try {
+                company1.setReviews(reviewClient.getReviews(id));
+                return company1;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            throw new CompanyException("Company with id: " + id + "does not exist.");
+        }
+    }
+
+
+    @Override
     public String addCompany(Company company) {
         return companyRepository.save(company).getName();
     }

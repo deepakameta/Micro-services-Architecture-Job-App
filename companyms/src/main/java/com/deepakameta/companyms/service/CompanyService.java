@@ -12,6 +12,8 @@ public interface CompanyService {
 
     Company getCompany(long id) throws CompanyException;
 
+    Company getCompanyById(long id) throws CompanyException;
+
     String addCompany(Company company);
 
     String updateCompanyById(long companyId, Company company) throws CompanyException;

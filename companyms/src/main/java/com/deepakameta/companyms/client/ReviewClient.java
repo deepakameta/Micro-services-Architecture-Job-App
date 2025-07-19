@@ -10,6 +10,6 @@ import java.util.List;
 @FeignClient(name = "reviewms")
 public interface ReviewClient {
 
-    @GetMapping("/{companyId}/reviews")
+    @GetMapping("/reviews/{companyId}/")
     List<Review> getReviews(@PathVariable long companyId);
 }

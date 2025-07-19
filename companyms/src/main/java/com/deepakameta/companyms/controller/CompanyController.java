@@ -26,6 +26,15 @@ public class CompanyController {
     @GetMapping("/{id}")
     public ResponseEntity<Company> geCompanyById(@PathVariable long id) {
         try {
+            return ResponseEntity.ok(companyService.getCompanyById(id));
+        } catch (CompanyException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/single/{id}")
+    public ResponseEntity<Company> geCompany(@PathVariable long id) {
+        try {
             return ResponseEntity.ok(companyService.getCompany(id));
         } catch (CompanyException e) {
             return ResponseEntity.notFound().build();
